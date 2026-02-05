@@ -1,0 +1,43 @@
+RewriteEngine On
+RewriteBase /
+
+Options -Indexes
+<IfModule mod_negotiation.c>
+    Options -MultiViews
+</IfModule>
+
+# Block archive.org bot
+RewriteCond %{HTTP_USER_AGENT} ia_archiver [NC]
+RewriteRule .* - [F,L]
+
+# =========================
+# Redirect index.html to root
+# =========================
+RewriteRule ^index\.html$ / [R=301,L]
+
+# =========================
+# Remove trailing slash (about/ → about)
+# =========================
+RewriteCond %{REQUEST_URI} .+/$
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.+)/$ /$1 [R=301,L]
+
+# =========================
+# Remove .html extension
+# =========================
+RewriteCond %{THE_REQUEST} \s/+(.+)\.html [NC]
+RewriteRule ^ %1 [R=301,L]
+
+# =========================
+# Internally load .html file
+# =========================
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^(.+)$ $1.html [L]
+
+# =========================
+# Redirect other extensions to .html
+# =========================
+RewriteCond %{QUERY_STRING} ^$
+RewriteRule ^(.+)\.(shtml|phtml|jhtml|htm|php|aspx|asp|jsp|apk)$ $1.html [R=301,NC,L]
